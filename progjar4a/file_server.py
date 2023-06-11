@@ -18,9 +18,10 @@ class ProcessTheClient(threading.Thread):
 
     def run(self):
         while True:
-            data = self.connection.recv(32)
+            data = self.connection.recv(64)
             if data:
                 d = data.decode()
+                print(d)
                 hasil = fp.proses_string(d)
                 hasil=hasil+"\r\n\r\n"
                 self.connection.sendall(hasil.encode())

@@ -1,31 +1,48 @@
-import sys
+from socket import *
 import socket
+import threading
 import logging
-import datetime
+import time
+import sys
 
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Bind the socket to the port
-server_address = ('localhost', 10000)
-logging.warning(f"starting up on {server_address}")
-sock.bind(server_address)
-# Listen for incoming connections
-sock.listen(1)
-while True:
-	# Wait for a connection
-	logging.warning("opening connection")
-	connection, client_address = sock.accept()
-	logging.warning(f"connection from {client_address}")
-	# Receive the data in small chunks and retransmit it
-	while True:
-		waktu = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%s")
-		data = connection.recv(32)
-		logging.warning(f"{waktu} received {data}")
-		if data:
-			logging.warning("[SERVER] {waktu} sending data back to the client")
-			connection.sendall(data)
-		else:
-			logging.warning(f"[SERVER] {waktu} no more data from {client_address}")
-			break
-# Clean up the connection
-connection.close()
+class ProcessTheClient(threading.Thread):
+	def __init__(self,connection,address):
+		self.connection = connection
+		self.address = address
+		threading.Thread.__init__(self)
+
+	def run(self):
+		while True:
+			request = self.connection.recv(32).decode('utf-8')
+			if request.startswith("TIME") and request.endswith("\r\n"):
+				current_time = time.strftime("%H:%M:%S", time.localtime())
+				response = f"JAM {current_time}\r\n"
+				self.connection.send(response.encode('utf-8'))
+			else:
+				break
+		self.connection.close()
+
+class Server(threading.Thread):
+	def __init__(self):
+		self.the_clients = []
+		self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		threading.Thread.__init__(self)
+
+	def run(self):
+		self.my_socket.bind(('0.0.0.0',45000))
+		self.my_socket.listen(1)
+		while True:
+			self.connection, self.client_address = self.my_socket.accept()
+			logging.warning(f"connection from {self.client_address}")
+			
+			clt = ProcessTheClient(self.connection, self.client_address)
+			clt.start()
+			self.the_clients.append(clt)
+	
+
+def main():
+	svr = Server()
+	svr.start()
+
+if __name__=="__main__":
+	main()

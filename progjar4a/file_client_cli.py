@@ -17,7 +17,7 @@ def send_command(command_str=""):
         data_received="" #empty string
         while True:
             #socket does not receive all data at once, data comes in part, need to be concatenated at the end of process
-            data = sock.recv(16)
+            data = sock.recv(64)
             if data:
                 #data is not empty, concat with previous content
                 data_received += data.decode()
@@ -58,14 +58,34 @@ def remote_get(filename=""):
         fp = open(namafile,'wb+')
         fp.write(isifile)
         fp.close()
+        print(hasil)
         return True
     else:
         print("Gagal")
         return False
+    
+def remote_upload(filename=""):
+    command_str=f"UPLOAD {filename}"
+    hasil = send_command(command_str)
+    if (hasil['status']=='OK'):
+        print(hasil)
+    else:
+        print("Gagal")
+        return False
 
+def remote_delete(filename=""):
+    command_str=f"DELETE {filename}"
+    hasil = send_command(command_str)
+    if (hasil['status']=='OK'):
+        print(hasil)
+    else:
+        print("Gagal")
+        return False
 
 if __name__=='__main__':
-    server_address=('172.16.16.101',6666)
-    remote_list()
-    remote_get('donalbebek.jpg')
+    server_address=('localhost',6666)
+    # remote_list()
+    # remote_get('donalbebek.jpg')
+    # remote_upload('bintang.jpg')
+    remote_delete('bintang.jpg')
 

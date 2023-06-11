@@ -26,6 +26,18 @@ LIST
   - status: ERROR
   - data: pesan kesalahan
 
+UPLOAD
+* TUJUAN: untuk mengupload file kepada server
+* PARAMETER:
+  - PARAMETER1 : nama file
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data_filename: nama file yang disimpan
+- GAGAL:
+  - status: ERROR
+  - data: pesan kesalahan
+
 GET
 * TUJUAN: untuk mendapatkan isi file dengan menyebutkan nama file dalam parameter
 * PARAMETER:
@@ -39,3 +51,14 @@ GET
   - status: ERROR
   - data: pesan kesalahan
 
+DELETE
+* TUJUAN: untuk mendelete file di server
+* PARAMETER:
+  - PARAMETER1 : nama file
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - message: "File 'nama file' berhasil dihapus." | "File 'nama file' tidak ditemukan."
+- GAGAL:
+  - status: ERROR
+  - data: pesan kesalahan
